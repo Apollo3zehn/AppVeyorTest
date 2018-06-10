@@ -1,0 +1,31 @@
+version: '{build}'
+clone_depth: 1
+stack: node 8
+
+image:
+  - Visual Studio 2017
+  - Ubuntu
+
+branches:
+  only:
+    - master
+    - dev
+
+configuration:
+  - Release
+
+init:
+  - git config --global core.autocrlf true
+
+before_build:
+  - ps: node --version
+  - ps: npm --version
+  - ps: dotnet --info
+  - ps: "Get-ChildItem Env:"
+
+build_script:
+  - ps: dotnet build ./ConsoleApp1/ConsoleApp1.csproj"                         -c $Env:Configuration /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG
+
+artifacts:
+  - path: ./artifacts/packages/**/*.nupkg
+  - path: ./artifacts/msi/**/*.msi
