@@ -23,7 +23,7 @@ before_build:
   - ps: "Get-ChildItem Env:"
 
 build_script:
-  - ps: dotnet build ./ConsoleApp1/ConsoleApp1.csproj"                         -c $Env:Configuration /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG
+  - ps: dotnet build ./ConsoleApp1/ConsoleApp1.csproj                         -c $Env:Configuration /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG
 
 artifacts:
   - path: ./artifacts/packages/**/*.nupkg
