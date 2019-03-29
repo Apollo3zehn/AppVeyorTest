@@ -25,20 +25,19 @@ init:
 
 install:
 - ps: |
-  if ($env:APPVEYOR_JOB_NAME -eq $env:JobToWait)
-  {
-      Get-Date > $env:FileName
-      Push-AppveyorArtifact ./$env:FileName
-  }
+    if ($env:APPVEYOR_JOB_NAME -eq $env:JobToWait)
+    {
+        Get-Date > $env:FileName
+        Push-AppveyorArtifact ./$env:FileName
+    }
 
 - ps: |
-  Import-module ./test.ps1 -Force
+    Import-module ./test.ps1 -Force
 
-  if ($env:APPVEYOR_JOB_NAME -ne $env:JobToWait) 
-  {
-      Start-ArtifactDownload($env:JobToWait, $env:FileName, $env:ApiKey)
-  }
+    if ($env:APPVEYOR_JOB_NAME -ne $env:JobToWait) 
+    {
+        Start-ArtifactDownload($env:JobToWait, $env:FileName, $env:ApiKey)
+    }
 
 build: off
 test: off
-

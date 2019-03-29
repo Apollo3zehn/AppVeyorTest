@@ -1,7 +1,7 @@
-function Start-ArtifactDownload([string]$jobName, [string]$fileName)
+function Start-ArtifactDownload([string]$jobName, [string]$fileName, [string]$apiKey)
 {
     $headers = @{
-        "Authorization" = "Bearer $ApiKey"
+        "Authorization" = "Bearer $apiKey"
         "Content-type" = "application/json"
     }
 
