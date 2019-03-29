@@ -10,14 +10,14 @@ function Start-ArtifactDownload([string]$jobName, [string]$fileName, [string]$ap
     $success = $job.status -eq "success"
     $jobId = $job.jobId;
 
-    if (!$success) 
-    {
-        throw "Job `"$jobName`" was not finished successfully. State is $job.status."
-    }
-
     if (!$jobId) 
     {
         throw "Unable to get job ID for the job `"$jobName`""
+    }
+
+    if (!$success) 
+    {
+        throw "Job `"$jobName`" was not finished successfully. State is $($job.status)."
     }
 
     Start-FileDownload https://ci.appveyor.com/api/buildjobs/$jobId/artifacts/$fileName.txt
