@@ -3,6 +3,7 @@ clone_depth: 1
 stack: node 8
 
 image:
+  - Visual Studio 2017
   - Ubuntu
 
 branches:
@@ -15,9 +16,6 @@ environment:
     secure: SeomICfFXAQobyK5uMGeAhb0uljBxicG4Z56pWxWCXA=
   TimeOutMins: 2
   JobToWait: 'Environment: test=1'
-  matrix:
-  - test: 1 
-  - test: 2
 
 configuration:
   - Release
@@ -32,8 +30,7 @@ install:
       Get-Date > date.txt  
       Push-AppveyorArtifact ./date.txt
     }
-    
-    if ($env:APPVEYOR_JOB_NAME -ne $env:JobToWait) 
+    else 
     {
       write-host "Waiting for job `"$env:JobToWait`" to complete"
       
