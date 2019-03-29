@@ -37,6 +37,7 @@ install:
     if ($env:APPVEYOR_JOB_NAME -ne $env:JobToWait) 
     {
         Start-ArtifactDownload -JobName $env:JobToWait -FileName $env:FileName -ApiKey $env:ApiKey
+        if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode)  }
     }
 
 build: off
