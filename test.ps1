@@ -22,7 +22,7 @@ function Start-ArtifactDownload([string]$jobName, [string]$fileName, [string]$ap
 
     try 
     {
-        Start-FileDownload https://ci.appveyor.com/api/buildjobs/$jobId/artifacts/$fileName.txt
+        Start-FileDownload https://ci.appveyor.com/api/buildjobs/$jobId/artifacts/$fileName
     }
     catch 
     {
