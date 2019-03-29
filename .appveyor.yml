@@ -10,21 +10,55 @@ branches:
     - master
     - dev
 
+environment:
+  ApiKey:
+    secure: SeomICfFXAQobyK5uMGeAhb0uljBxicG4Z56pWxWCXA=
+  TimeOutMins: 2
+  JobToWait: 'Environment: test=1'
+  matrix:
+  - test: 1 
+  - test: 2
+
 configuration:
   - Release
 
 init:
   - git config --global core.autocrlf true
 
-before_build:
-  - ps: node --version
-  - ps: npm --version
-  - ps: dotnet --info
-  - ps: "Get-ChildItem Env:"
+install: ps |
+    if ($env:APPVEYOR_JOB_NAME -eq $env:JobToWait) 
+    {
+      Get-Date > date.txt  
+      Push-AppveyorArtifact .\date.txt # upload artifact for other job to download
+    }
+    
+    if ($env:APPVEYOR_JOB_NAME -ne $env:JobToWait) 
+    {
+      write-host "Waiting for job `"$env:JobToWait`" to complete"
+      
+      $headers = @{
+          "Authorization" = "Bearer $ApiKey"
+          "Content-type" = "application/json"
+      }
+      [datetime]$stop = ([datetime]::Now).AddMinutes($env:TimeOutMins)
+      [bool]$success = $false  
+      
+      while(!$success -and ([datetime]::Now) -lt $stop) 
+      {
+          $project = Invoke-RestMethod -Uri "https://ci.appveyor.com/api/projects/$env:APPVEYOR_ACCOUNT_NAME/$env:APPVEYOR_PROJECT_SLUG" -Headers $headers -Method GET
+      
+          $JobToWaitJson = $project.build.jobs | where {$_.name -eq $env:JobToWait}  
+          $success = $JobToWaitJson.status -eq "success"
+          $JobToWaitId = $JobToWaitJson.jobId;
+          if (!$success) {Start-sleep 5}
+      }
+      
+      if (!$success) {throw "Job `"$env:JobToWait`" was not finished in $env:TimeOutMins minutes"}
+      if (!$JobToWaitId) {throw "Unable to get JobId for the job `"$env:JobToWait`""}
+      
+      Start-FileDownload  https://ci.appveyor.com/api/buildjobs/$JobToWaitId/artifacts/date.txt
+    }
 
-build_script:
-  - ps: dotnet build ./ConsoleApp1/ConsoleApp1.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG
+build: off
+test: off
 
-artifacts:
-  - path: ./artifacts/packages/**/*.nupkg
-  - path: ./artifacts/msi/**/*.msi
