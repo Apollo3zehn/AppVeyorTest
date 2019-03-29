@@ -3,8 +3,8 @@ clone_depth: 1
 stack: node 8
 
 image:
-  - Visual Studio 2017
   - Ubuntu
+  - Visual Studio 2017
 
 branches:
   only:
@@ -14,8 +14,8 @@ branches:
 environment:
   ApiKey:
     secure: SeomICfFXAQobyK5uMGeAhb0uljBxicG4Z56pWxWCXA=
-  TimeOutMins: 2
-  JobToWait: 'Environment: test=1'
+  JobToWait: 'Image: Ubuntu'
+  FileName: 'date.text'
 
 configuration:
   - Release
@@ -25,38 +25,19 @@ init:
 
 install:
 - ps: |
-    if ($env:APPVEYOR_JOB_NAME -eq $env:JobToWait)
-    {
-      Get-Date > date.txt  
-      Push-AppveyorArtifact ./date.txt
-    }
-    else 
-    {
-      write-host "Waiting for job `"$env:JobToWait`" to complete"
-      
-      $headers = @{
-          "Authorization" = "Bearer $ApiKey"
-          "Content-type" = "application/json"
-      }
+  if ($env:APPVEYOR_JOB_NAME -eq $env:JobToWait)
+  {
+      Get-Date > $env:FileName
+      Push-AppveyorArtifact ./$env:FileName
+  }
 
-      $stop = ([DateTime]::Now).AddMinutes($env:TimeOutMins)
-      $success = $false  
-      
-      while(!$success -and ([DateTime]::Now) -lt $stop) 
-      {
-          $project = Invoke-RestMethod -Uri "https://ci.appveyor.com/api/projects/$env:APPVEYOR_ACCOUNT_NAME/$env:APPVEYOR_PROJECT_SLUG" -Headers $headers -Method GET
-      
-          $JobToWaitJson = $project.build.jobs | where {$_.name -eq $env:JobToWait}  
-          $success = $JobToWaitJson.status -eq "success"
-          $JobToWaitId = $JobToWaitJson.jobId;
-          if (!$success) {Start-sleep 5}
-      }
-      
-      if (!$success) {throw "Job `"$env:JobToWait`" was not finished in $env:TimeOutMins minutes"}
-      if (!$JobToWaitId) {throw "Unable to get JobId for the job `"$env:JobToWait`""}
-      
-      Start-FileDownload  https://ci.appveyor.com/api/buildjobs/$JobToWaitId/artifacts/date.txt
-    }
+- ps: |
+  Import-module ./test.ps1 -Force
+
+  if ($env:APPVEYOR_JOB_NAME -ne $env:JobToWait) 
+  {
+      Start-ArtifactDownload($env:JobToWait, $env:FileName, $env:ApiKey)
+  }
 
 build: off
 test: off
