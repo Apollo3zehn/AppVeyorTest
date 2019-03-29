@@ -20,5 +20,12 @@ function Start-ArtifactDownload([string]$jobName, [string]$fileName, [string]$ap
         throw "Job `"$jobName`" was not finished successfully. State is $($job.status)."
     }
 
-    Start-FileDownload https://ci.appveyor.com/api/buildjobs/$jobId/artifacts/$fileName.txt
+    try 
+    {
+        Start-FileDownload https://ci.appveyor.com/api/buildjobs/$jobId/artifacts/$fileName.txt
+    }
+    catch 
+    {
+        $host.SetShouldExit($LastExitCode) 
+    }
 }
