@@ -26,7 +26,7 @@ init:
   - git config --global core.autocrlf true
 
 install:
-  - ps: |
+- ps: |
     if ($env:APPVEYOR_JOB_NAME -eq $env:JobToWait)
     {
       Get-Date > date.txt  
