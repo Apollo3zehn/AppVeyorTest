@@ -26,6 +26,6 @@ function Start-ArtifactDownload([string]$jobName, [string]$fileName, [string]$ap
     }
     catch 
     {
-        $host.SetShouldExit($LastExitCode) 
+        throw "Could not download file `"$fileName`"."
     }
 }
