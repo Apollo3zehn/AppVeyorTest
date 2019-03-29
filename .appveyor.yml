@@ -36,7 +36,7 @@ install:
 
     if ($env:APPVEYOR_JOB_NAME -ne $env:JobToWait) 
     {
-        Start-ArtifactDownload($env:JobToWait, $env:FileName, $env:ApiKey)
+        Start-ArtifactDownload -JobName $env:JobToWait -FileName $env:FileName -ApiKey $env:ApiKey
     }
 
 build: off
