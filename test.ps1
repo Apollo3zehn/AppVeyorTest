@@ -12,7 +12,7 @@ function Start-ArtifactDownload([string]$jobName, [string]$fileName, [string]$ap
 
     if (!$success) 
     {
-        throw "Job `"$jobName`" was not finished successfully"
+        throw "Job `"$jobName`" was not finished successfully. State is $job.status."
     }
 
     if (!$jobId) 
