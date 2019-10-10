@@ -1,10 +1,9 @@
 version: '{build}'
 clone_depth: 1
-stack: node 8
 
 image:
   - Ubuntu
-  - Visual Studio 2017
+  - Visual Studio 2019
 
 branches:
   only:
@@ -32,7 +31,7 @@ install:
     }
 
 - ps: |
-    Import-module ./test.ps1 -Force
+    Import-module ./build/Start-ArtifactDownload.ps1 -Force
 
     if ($env:APPVEYOR_JOB_NAME -ne $env:JobToWait) 
     {
